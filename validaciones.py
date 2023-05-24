@@ -17,6 +17,14 @@ def validar_entero(string_num:str)->bool:
         return False
 
 def validar_string_vacio(string:str)-> bool:
+    """Valida que el string no tenga espacios en blanco
+
+    Args:
+        string (str): La cadena a validar
+
+    Returns:
+        bool: True en caso ser una cadena vacia, False en caso contrario
+    """
     patron = re.compile("^[ ]+$")
     
     if re.match(patron,string):

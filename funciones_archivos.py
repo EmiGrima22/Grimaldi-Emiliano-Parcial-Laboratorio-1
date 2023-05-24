@@ -80,4 +80,21 @@ def leer_json(nombre_archivo:str)->dict:
     
     return datos
     
-    
+def escribir_csv(lista_insumos:list, nombre_archivo:str):
+    """Crea un archivo csv a partir de la lista de diccionarios con los insumos
+
+    Args:
+        lista_insumos (list): lista de diccionarios con los insumos\n
+        nombre_archivo (str): nombre del archivo con su extension csv
+    """
+    with open(nombre_archivo, "w", encoding='utf-8') as file:
+                    
+        encabezado = lista_insumos[0].keys()
+        
+        linea_columna = ",".join(encabezado)
+        file.write(linea_columna.upper() + "\n")
+
+        for insumo in lista_insumos:
+            linea = insumo.values()
+            linea_columna_valores = ','.join(linea)
+            file.write(linea_columna_valores + '\n')

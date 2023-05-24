@@ -1,5 +1,6 @@
 from funciones_archivos import *
 from functools import reduce
+from validaciones import *
 
 def fabricar_lista_diccionarios_insumos(lista:list)->list | int:
     """Fabrica una lista de diccionarios a partir de una lista 
@@ -565,24 +566,6 @@ def reemplazar_valores(lista_original:list, lista_reemplazar:list):
     for i in range(len(lista_original)):
         lista_original[i]["precio"] = lista_reemplazar[i]
 
-def escribir_csv(lista_insumos:list, nombre_archivo:str):
-    """Crea un archivo csv a partir de la lista de diccionarios con los insumos
-
-    Args:
-        lista_insumos (list): lista de diccionarios con los insumos\n
-        nombre_archivo (str): nombre del archivo con su extension csv
-    """
-    with open(nombre_archivo, "w", encoding='utf-8') as file:
-                    
-        encabezado = lista_insumos[0].keys()
-        
-        linea_columna = ",".join(encabezado)
-        file.write(linea_columna.upper() + "\n")
-
-        for insumo in lista_insumos:
-            linea = insumo.values()
-            linea_columna_valores = ','.join(linea)
-            file.write(linea_columna_valores + '\n')
 
 def calcular_aumento_aplicar_guardar_archivo(lista_insumos:list, nombre_archivo:str):
     """Quita los caracteres '$' para poder parsear los valores de los precios a float, y poder realizar el calculo del aumento, reemplaza los valores de los precios antiguos con los nuevos, vuelve a poner el signo '$' al precio y escribe el csv con los precios actualizados con el aumento
@@ -598,3 +581,84 @@ def calcular_aumento_aplicar_guardar_archivo(lista_insumos:list, nombre_archivo:
     convertir_en_pesos(lista_insumos)
     escribir_csv(lista_insumos, nombre_archivo)
     imprimir_dato("Precios actualizados correctamente")
+
+def agregar_insumo(nombre_archivo_fuente:str, lista_insumos:list):
+    """Agrega un nuevo insumo al final de la lista, antes de agregarlo valida cada uno de los campos
+
+    Args:
+        nombre_archivo_fuente (str): El archivo fuente que contiene los datos a leer\n
+        lista_insumos (list): Lista de diccionarios de los insumos
+    """
+    marcas_nuevas = []
+    with open(nombre_archivo_fuente,"r") as archivo:
+        for linea in archivo:
+            linea = linea.replace("\n", "")
+            marcas_nuevas.append(linea)
+
+    while True:
+        for marca in marcas_nuevas:
+            imprimir_dato(marca)
+            
+        marca_agregar = input("Ingrese marca a agregar\n")
+        
+        if buscar_por_key(marcas_nuevas, marca_agregar):
+            break
+        else:
+            imprimir_dato("Esa marca no se encuentra")
+    
+    while True:
+        
+        imprimir_dato("Las id existentes son")
+        lista_id_existentes = filtrar_categoria(lista_insumos,"id")
+        for id in lista_id_existentes:
+            imprimir_dato(id)
+            
+        id_agregar = input("Ingrese ID del nuevo producto\n")
+
+        if not  buscar_por_key(lista_id_existentes, id_agregar):
+            break
+        else:
+            imprimir_dato("Esa ID ya se encuentra con otro insumo")
+    
+    
+    caracteristicas_insumo_agregar = []
+    while True:
+        while True:
+            caracteristica_agregar = input("Ingrese caracteristica (hasta 3)\n")
+            if not validar_string_vacio(caracteristica_agregar) and len(caracteristica_agregar) > 0:
+                break
+            else:
+                imprimir_dato("No se permiten cadenas vacias, ni espacios en blanco")
+        
+        if len(caracteristicas_insumo_agregar) < 3:
+            caracteristicas_insumo_agregar.append(caracteristica_agregar)
+        else:
+            imprimir_dato("Alcanzo el maximo de caracteristicas")
+            break
+            
+        while True:
+            confirmacion_caracteristica = input("¿Desea cargar otra caracteristica? s/n\n").lower()
+            if confirmacion_caracteristica == "s" or confirmacion_caracteristica == "n": 
+                break
+        if confirmacion_caracteristica == "n":
+            break
+    
+    while True: 
+        precio_insumo_nuevo = input("Ingresar precio\n")
+        try:
+            precio_insumo_nuevo = float(precio_insumo_nuevo)
+            break
+        except ValueError:
+            imprimir_dato("Error tipo. Se pidio un decimal")
+            
+    nombre_insumo_nuevo = input("Ingrese el nombre del insumo\n")
+    
+    insumo_nuevo = {
+        "id": id_agregar,
+        "nombre": nombre_insumo_nuevo,
+        "marca": marca_agregar,
+        "precio": f"${precio_insumo_nuevo}",
+        "caracteristicas": '~'.join(caracteristicas_insumo_agregar)
+    }
+    
+    lista_insumos.append(insumo_nuevo)

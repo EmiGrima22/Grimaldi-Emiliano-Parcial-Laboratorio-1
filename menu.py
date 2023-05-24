@@ -1,5 +1,4 @@
 import os
-from validaciones import *
 from funciones_insumos import *
 
 
@@ -8,7 +7,7 @@ def imprimir_menu_insumos()->None:
     """
     print("####             ADMINISTRACION DE INSUMOS             ####\n")
     print("-----------------------------------------------------------\n")
-    print(" 1 --> Cargar datos desde archivo\n 2 --> Listar cantidad por marca\n 3 --> Listar insumos por marca\n 4 --> Buscar insumo por característica\n 5 --> Listar insumos ordenados\n 6 --> Realizar compras\n 7 --> Guardar en formato JSON\n 8 --> Leer desde formato JSON\n 9 --> Actualizar precios\n10 --> Salir del programa\n\n")
+    print(" 1 --> Cargar datos desde archivo\n 2 --> Listar cantidad por marca\n 3 --> Listar insumos por marca\n 4 --> Buscar insumo por característica\n 5 --> Listar insumos ordenados\n 6 --> Realizar compras\n 7 --> Guardar en formato JSON\n 8 --> Leer desde formato JSON\n 9 --> Actualizar precios\n10 --> Agregar nuevo producto a la lista\n11 --> Guardar todos los datos actualizados\n12 --> Salir del programa\n\n")
     
 def insumos_menu_principal()->int:
     """Muestra el menu, pide una opcion y la parsea a entero
@@ -30,12 +29,13 @@ def insumos_app() -> None:
     
     flag_cargar_csv = False
     flag_json = False
-
+    flag_nuevo_insumo = False
+    
     while True:
         os.system("cls")
         while True:
             opcion = insumos_menu_principal()
-            if opcion >= 1 and opcion <= 10:
+            if opcion >= 1 and opcion <= 12:
                 break
             else:
                 imprimir_dato("Opcion incorrecta")
@@ -100,6 +100,29 @@ def insumos_app() -> None:
                 else:
                     imprimir_dato("Primero debe leer el archivo csv")
             case 10:
+                if flag_cargar_csv:
+                    agregar_insumo("marcas.txt", lista_insumos)
+                    flag_nuevo_insumo = True
+                else:
+                    imprimir_dato("Primero debe leer el archivo csv")
+            case 11:
+                if flag_nuevo_insumo and flag_cargar_csv:
+                    while True:
+                        formato_exportacion = input("Ingrese el formato de exportacion [csv - json]\n")
+                        if formato_exportacion == "csv" or formato_exportacion == "json":
+                            break
+                        else:
+                            imprimir_dato("Formato de exportacion invalido")
+                            
+                    nombre_archivo_nuevo = input("Ingrese el nombre del archivo\n")
+                    
+                    if formato_exportacion == "csv":
+                        escribir_csv(lista_insumos, f"{nombre_archivo_nuevo}.{formato_exportacion}")
+                    else:
+                        escribir_json(f"{nombre_archivo_nuevo}.{formato_exportacion}", lista_insumos)
+                else:
+                    imprimir_dato("Primero cargue el insumo nuevo")    
+            case 12:
                 while True:
                     confirmacion = input("¿Seguro desea salir? s/n\n").lower()
                     if confirmacion == "s" or confirmacion == "n": 
